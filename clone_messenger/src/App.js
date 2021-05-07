@@ -1,27 +1,38 @@
 import './App.css';
 import { useState, useEffect } from 'react'
-import { Button, FormControl, InputLabel, Input } from '@material-ui/core'
+import { Button, FormControl, InputLabel, Input, IconButton } from '@material-ui/core'
+import SendIcon from '@material-ui/icons/Send';
 import Message from './Components/Message'
+import db from './firebase';
+import firebase from 'firebase'
+import FlipMove from 'react-flip-move';
 
 function App() {
+  const [input, setInput] = useState('')
+  const [messages, setMessages] = useState([])
+
   useEffect(() => {
     setUsername(prompt("Please enter username"))
   }, [])
-  const [input, setInput] = useState('')
-  const [messages, setMessages] = useState([
-    { username: "Goku", text: 'Hey' },
-    { username: "Furious", text: "What's going on?" },
-  ])
+
+  useEffect(() => {
+    db.collection('messages')
+      .orderBy('timestamp', 'desc')
+      .onSnapshot(snapshot => {
+        setMessages(snapshot.docs.map(doc => ({ id: doc.id, message: doc.data() })))
+      })
+  }, [])
+
   const [username, setUsername] = useState('')
 
 
-
-  console.log(input)
-  console.log(messages)
-
   const sendMessage = (e) => {
     e.preventDefault()
-    setMessages([...messages, { username: username, text: input }])
+    db.collection('messages').add({
+      message: input,
+      username: username,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    })
     setInput('')
   }
 
@@ -29,17 +40,20 @@ function App() {
     <div className="App">
       <h1>FACEBOOK MESSENGER</h1>
       <h3>Welcome {username}</h3>
-      <form>
-        <FormControl>
-          <InputLabel>Enter Message</InputLabel>
-          <Input value={input} onChange={(e) => { setInput(e.target.value) }} />
-          <Button disabled={!input} variant="contained" color="primary" type='submit' onClick={sendMessage}>Send Message</Button>
+      <form className="app__form">
+        <FormControl className="app__formControl">
+          <Input className="app__input" placeholder="Enter Message...." value={input} onChange={(e) => { setInput(e.target.value) }} />
+          <IconButton className="app__iconButton" disabled={!input} variant="contained" color="primary" type='submit' onClick={sendMessage}>
+            <SendIcon />
+          </IconButton>
+
         </FormControl>
       </form>
-      {messages.map(message =>
-        (<Message message={message} username={username} />))
-      }
-
+      <FlipMove>
+        {messages.map(({ id, message }) =>
+          (<Message key={id} message={message} username={username} />))
+        }
+      </FlipMove>
     </div>
   );
 }

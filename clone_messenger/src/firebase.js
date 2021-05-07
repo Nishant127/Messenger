@@ -1,5 +1,4 @@
-import React from 'react'
-
+import firebase from "firebase"
 const firebaseApp = firebase.initializeApp({
     apiKey: "AIzaSyBwVqEg8AFZLi7YSvpbu4kYMPq2PHeokuM",
     authDomain: "messenger-clone-e0d57.firebaseapp.com",
