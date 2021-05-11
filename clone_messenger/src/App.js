@@ -42,7 +42,7 @@ function App() {
       <h3>Welcome {username}</h3>
       <form className="app__form">
         <FormControl className="app__formControl">
-          <Input className="app__input" placeholder="Enter Message...." value={input} onChange={(e) => { setInput(e.target.value) }} />
+          <Input className="app__input" placeholder="Enter Message..." value={input} onChange={(e) => { setInput(e.target.value) }} />
           <IconButton className="app__iconButton" disabled={!input} variant="contained" color="primary" type='submit' onClick={sendMessage}>
             <SendIcon />
           </IconButton>
